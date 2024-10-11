@@ -61,12 +61,12 @@ export function History() {
     <View style={styles.container}>
       <Header
         title="History"
-        subtitle={`Your study history${"\n"}completed`}
+        subtitle={`Exams completed`}
         icon={HouseLine}
         onPress={goBack}
       />
 
-      <ScrollView
+      {/*  <ScrollView
         contentContainerStyle={styles.history}
         showsVerticalScrollIndicator={false}
       >
@@ -98,7 +98,7 @@ export function History() {
             </Swipeable>
           </Animated.View>
         ))}
-      </ScrollView>
+      </ScrollView> */}
     </View>
   );
 }
