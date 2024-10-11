@@ -11,6 +11,7 @@ const { Navigator, Screen, Group } = createNativeStackNavigator();
 export function AppRoutes() {
   return (
     <Navigator
+      initialRouteName="Login" // Set Login as the initial route
       screenOptions={{
         headerShown: false,
       }}

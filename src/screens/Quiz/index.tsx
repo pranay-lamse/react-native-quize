@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { Alert, BackHandler, Text, View } from 'react-native';
+import { useEffect, useState } from "react";
+import { Alert, BackHandler, Text, View } from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -10,31 +10,31 @@ import Animated, {
   useAnimatedScrollHandler,
   Extrapolate,
   runOnJS,
-} from 'react-native-reanimated';
-import { GestureDetector, Gesture } from 'react-native-gesture-handler';
-import { useNavigation, useRoute } from '@react-navigation/native';
-import { Audio } from 'expo-av';
-import * as Haptics from 'expo-haptics';
+} from "react-native-reanimated";
+import { GestureDetector, Gesture } from "react-native-gesture-handler";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { Audio } from "expo-av";
+import * as Haptics from "expo-haptics";
 
-import { styles } from './styles';
-import { THEME } from '../../styles/theme';
+import { styles } from "./styles";
+import { THEME } from "../../styles/theme";
 
-import { QUIZ } from '../../data/quiz';
-import { historyAdd } from '../../storage/quizHistoryStorage';
+import { QUIZ } from "../../data/quiz";
+import { historyAdd } from "../../storage/quizHistoryStorage";
 
-import { Loading } from '../../components/Loading';
-import { Question } from '../../components/Question';
-import { QuizHeader } from '../../components/QuizHeader';
-import { ConfirmButton } from '../../components/ConfirmButton';
-import { OutlineButton } from '../../components/OutlineButton';
-import { ProgressBar } from '../../components/ProgressBar';
-import { OverlayFeedback } from '../../components/OverlayFeedback';
+import { Loading } from "../../components/Loading";
+import { Question } from "../../components/Question";
+import { QuizHeader } from "../../components/QuizHeader";
+import { ConfirmButton } from "../../components/ConfirmButton";
+import { OutlineButton } from "../../components/OutlineButton";
+import { ProgressBar } from "../../components/ProgressBar";
+import { OverlayFeedback } from "../../components/OverlayFeedback";
 
 interface Params {
   id: string;
 }
 
-type QuizProps = typeof QUIZ[0];
+type QuizProps = (typeof QUIZ)[0];
 
 const CARD_INCLINATION = 10;
 const CARD_SKIP_AREA = -200;
@@ -44,7 +44,9 @@ export function Quiz() {
   const [isLoading, setIsLoading] = useState(true);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [quiz, setQuiz] = useState<QuizProps>({} as QuizProps);
-  const [alternativeSelected, setAlternativeSelected] = useState<null | number>(null);
+  const [alternativeSelected, setAlternativeSelected] = useState<null | number>(
+    null
+  );
   const [statusReply, setStatusReply] = useState(0);
 
   const shake = useSharedValue(0);
@@ -58,8 +60,8 @@ export function Quiz() {
 
   async function playSound(isCorrect: boolean) {
     const file = isCorrect
-      ? require('../../assets/correct.mp3')
-      : require('../../assets/wrong.mp3');
+      ? require("../../assets/correct.mp3")
+      : require("../../assets/wrong.mp3");
 
     const { sound } = await Audio.Sound.createAsync(file, { shouldPlay: true });
 
@@ -68,9 +70,9 @@ export function Quiz() {
   }
 
   function handleSkipConfirm() {
-    Alert.alert('Pular', 'Deseja realmente pular a questão?', [
-      { text: 'Sim', onPress: () => handleNextQuestion() },
-      { text: 'Não', onPress: () => { } }
+    Alert.alert("Skip", "Do you really want to skip the question?", [
+      { text: "Yes", onPress: () => handleNextQuestion() },
+      { text: "No", onPress: () => {} },
     ]);
   }
 
@@ -80,10 +82,10 @@ export function Quiz() {
       title: quiz.title,
       level: quiz.level,
       points,
-      questions: quiz.questions.length
+      questions: quiz.questions.length,
     });
 
-    navigate('finish', {
+    navigate("finish", {
       points: String(points),
       total: String(quiz.questions.length),
     });
@@ -91,7 +93,7 @@ export function Quiz() {
 
   function handleNextQuestion() {
     if (currentQuestion < quiz.questions.length - 1) {
-      setCurrentQuestion(prevState => prevState + 1)
+      setCurrentQuestion((prevState) => prevState + 1);
     } else {
       handleFinished();
     }
@@ -103,7 +105,7 @@ export function Quiz() {
     }
 
     if (quiz.questions[currentQuestion].correct === alternativeSelected) {
-      setPoints(prevState => prevState + 1);
+      setPoints((prevState) => prevState + 1);
 
       await playSound(true);
 
@@ -120,15 +122,15 @@ export function Quiz() {
   }
 
   function handleStop() {
-    Alert.alert('Parar', 'Deseja parar agora?', [
+    Alert.alert("Stop", "Do you want to stop now?", [
       {
-        text: 'Não',
-        style: 'cancel',
+        text: "No",
+        style: "cancel",
       },
       {
-        text: 'Sim',
-        style: 'destructive',
-        onPress: () => navigate('home')
+        text: "Yes",
+        style: "destructive",
+        onPress: () => navigate("home"),
       },
     ]);
 
@@ -140,39 +142,41 @@ export function Quiz() {
 
     shake.value = withSequence(
       withTiming(3, { duration: 400, easing: Easing.bounce }),
-      withTiming(0, undefined, finished => {
-        'worklet';
+      withTiming(0, undefined, (finished) => {
+        "worklet";
 
         if (finished) {
-          runOnJS(handleNextQuestion)()
+          runOnJS(handleNextQuestion)();
         }
       })
     );
   }
 
   const shakeStyleAnimated = useAnimatedStyle(() => ({
-    transform: [{
-      translateX: interpolate(
-        shake.value,
-        [0, 0.5, 1, 1.5, 2, 2.5, 3],
-        [0, -15, 0, 15, 0, -15, 0],
-      ),
-    }]
+    transform: [
+      {
+        translateX: interpolate(
+          shake.value,
+          [0, 0.5, 1, 1.5, 2, 2.5, 3],
+          [0, -15, 0, 15, 0, -15, 0]
+        ),
+      },
+    ],
   }));
 
   const scrollHandler = useAnimatedScrollHandler({
-    onScroll: event => {
+    onScroll: (event) => {
       scrollY.value = event.contentOffset.y;
-    }
+    },
   });
 
   const fixedProgressBarStyles = useAnimatedStyle(() => ({
-    position: 'absolute',
+    position: "absolute",
     zIndex: 1,
     paddingTop: 50,
     backgroundColor: THEME.COLORS.GREY_500,
-    width: '110%',
-    left: '-5%',
+    width: "110%",
+    left: "-5%",
     opacity: interpolate(scrollY.value, [50, 90], [0, 1], Extrapolate.CLAMP),
     transform: [
       {
@@ -180,33 +184,32 @@ export function Quiz() {
           scrollY.value,
           [50, 100],
           [-40, 0],
-          Extrapolate.CLAMP,
-        )
-      }
-    ]
+          Extrapolate.CLAMP
+        ),
+      },
+    ],
   }));
 
   const headerStyles = useAnimatedStyle(() => ({
     opacity: interpolate(scrollY.value, [60, 90], [1, 0], Extrapolate.CLAMP),
   }));
 
-  const onPan = Gesture
-    .Pan()
+  const onPan = Gesture.Pan()
     .activateAfterLongPress(200)
-    .onUpdate(event => {
+    .onUpdate((event) => {
       const moveToLeft = event.translationX < 0;
 
       if (moveToLeft) {
         cardPosition.value = event.translationX;
       }
     })
-    .onEnd(event => {
+    .onEnd((event) => {
       if (event.translationX < CARD_SKIP_AREA) {
         runOnJS(handleSkipConfirm)();
       }
 
       cardPosition.value = withTiming(0);
-    })
+    });
 
   const dragStyles = useAnimatedStyle(() => {
     const rotateZ = cardPosition.value / CARD_INCLINATION;
@@ -214,13 +217,13 @@ export function Quiz() {
     return {
       transform: [
         { translateX: cardPosition.value },
-        { rotateZ: `${rotateZ}deg` }
-      ]
-    }
+        { rotateZ: `${rotateZ}deg` },
+      ],
+    };
   });
 
   useEffect(() => {
-    const quizSelected = QUIZ.filter(item => item.id === id)[0];
+    const quizSelected = QUIZ.filter((item) => item.id === id)[0];
 
     setQuiz(quizSelected);
     setIsLoading(false);
@@ -228,15 +231,15 @@ export function Quiz() {
 
   useEffect(() => {
     const backHandler = BackHandler.addEventListener(
-      'hardwareBackPress',
-      handleStop,
+      "hardwareBackPress",
+      handleStop
     );
 
     return () => backHandler.remove();
   }, []);
 
   if (isLoading) {
-    return <Loading />
+    return <Loading />;
   }
 
   return (
@@ -279,10 +282,10 @@ export function Quiz() {
         </GestureDetector>
 
         <View style={styles.footer}>
-          <OutlineButton title="Parar" onPress={handleStop} />
+          <OutlineButton title="Stop" onPress={handleStop} />
           <ConfirmButton onPress={handleConfirm} />
         </View>
       </Animated.ScrollView>
-    </View >
+    </View>
   );
 }

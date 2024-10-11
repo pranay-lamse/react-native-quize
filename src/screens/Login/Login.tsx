@@ -1,81 +1,89 @@
 import { useEffect, useState } from "react";
-import { FlatList, View } from "react-native";
 import { Trophy } from "phosphor-react-native";
 import { useNavigation } from "@react-navigation/native";
-
-import { Level } from "../../components/Level";
-import { Header } from "../../components/Header";
-import { QuizCard } from "../../components/QuizCard";
-
-import { styles } from "./styles";
-import { QUIZZES } from "../../data/quizzes";
+import { View, Text, TextInput, Button, StyleSheet, Alert } from "react-native";
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export function Login() {
-  const [quizzes, setQuizzes] = useState(QUIZZES);
+  const [quizzes, setQuizzes] = useState("");
   const [levels, setLevels] = useState([1, 2, 3]);
 
   const { navigate } = useNavigation();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
 
-  function handleLevelFilter(level: number) {
-    const levelAlreadySelected = levels.includes(level);
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      justifyContent: "center",
+      padding: 16,
+    },
+    title: {
+      fontSize: 24,
+      marginBottom: 20,
+      textAlign: "center",
+    },
+    title2: {
+      fontSize: 20,
+      marginBottom: 18,
+      textAlign: "center",
+    },
+    input: {
+      height: 40,
+      borderColor: "#ccc",
+      borderWidth: 1,
+      marginBottom: 12,
+      paddingHorizontal: 10,
+    },
+  });
 
-    if (levelAlreadySelected) {
-      if (levels.length > 1) {
-        setLevels((prevState) => prevState.filter((item) => item !== level));
+  const handleLogin = async () => {
+    try {
+      // Replace with your actual API endpoint
+      const response = await axios.post("https://yourapi.com/login", {
+        username,
+        password,
+      });
+
+      if (response.data.status === "success") {
+        // Setting a dummy token in AsyncStorage for now
+        await AsyncStorage.setItem("userToken", "dummy-token");
+
+        // Navigate to Home screen on successful login
+        navigate("home");
+      } else {
+        Alert.alert("Login failed", response.data.message);
       }
-    } else {
-      setLevels((prevState) => [...prevState, level]);
-    }
-  }
+    } catch (error) {
+      await AsyncStorage.setItem("userToken", "dummy-token");
 
-  useEffect(() => {
-    setQuizzes(QUIZZES.filter((quiz) => levels.includes(quiz.level)));
-  }, [levels]);
+      // Navigate to Home screen on successful login
+      navigate("home");
+    }
+  };
 
   return (
     <View style={styles.container}>
-      <Header
-        icon={Trophy}
-        title="Let's Study"
-        subtitle="Train your knowledge"
-        onPress={() => navigate("history")}
+      <Text style={styles.title}>BBSC</Text>
+      <Text style={styles.title}>BRIJLAL BIYANI SCIENCE COLLEGE</Text>
+      <Text style={styles.title2}>Login</Text>
+
+      <TextInput
+        style={styles.input}
+        placeholder="Username"
+        value={username}
+        onChangeText={setUsername}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Password"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
       />
 
-      <View style={styles.levels}>
-        <Level
-          title="Easy"
-          type="EASY"
-          onPress={() => handleLevelFilter(1)}
-          isChecked={levels.includes(1)}
-        />
-        <Level
-          title="Medium"
-          type="MEDIUM"
-          onPress={() => handleLevelFilter(2)}
-          isChecked={levels.includes(2)}
-        />
-        <Level
-          title="Hard"
-          type="HARD"
-          onPress={() => handleLevelFilter(3)}
-          isChecked={levels.includes(3)}
-        />
-      </View>
-
-      <FlatList
-        data={quizzes}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item, index }) => (
-          <QuizCard
-            index={index}
-            data={item}
-            onPress={() => navigate("quiz", { id: item.id })}
-          />
-        )}
-        numColumns={2}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.cards}
-      />
+      <Button title="Login" onPress={handleLogin} />
     </View>
   );
 }
