@@ -1,7 +1,15 @@
 import { useEffect, useState } from "react";
 import { Trophy } from "phosphor-react-native";
 import { useNavigation } from "@react-navigation/native";
-import { View, Text, TextInput, Button, StyleSheet, Alert } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  Button,
+  StyleSheet,
+  Alert,
+  TouchableOpacity,
+} from "react-native";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -17,24 +25,43 @@ export function Login() {
     container: {
       flex: 1,
       justifyContent: "center",
-      padding: 16,
+      padding: 20,
+      backgroundColor: "#121212", // Dark background
     },
     title: {
-      fontSize: 24,
-      marginBottom: 20,
+      fontSize: 26,
+      color: "#FFFFFF", // White text
+      fontWeight: "bold",
+      marginBottom: 15,
       textAlign: "center",
     },
-    title2: {
-      fontSize: 20,
-      marginBottom: 18,
+    subtitle: {
+      fontSize: 18,
+      color: "#BBBBBB", // Light grey text
+      marginBottom: 25,
       textAlign: "center",
     },
     input: {
-      height: 40,
-      borderColor: "#ccc",
+      height: 45,
+      backgroundColor: "#1F1F1F", // Darker input background
+      color: "#FFFFFF", // White input text
+      borderColor: "#333333", // Dark border
       borderWidth: 1,
-      marginBottom: 12,
-      paddingHorizontal: 10,
+      borderRadius: 8,
+      paddingHorizontal: 12,
+      marginBottom: 15,
+    },
+    button: {
+      backgroundColor: "#6200EE", // Accent color for button
+      paddingVertical: 12,
+      borderRadius: 8,
+      marginTop: 10,
+      alignItems: "center",
+    },
+    buttonText: {
+      color: "#FFFFFF",
+      fontSize: 16,
+      fontWeight: "bold",
     },
   });
 
@@ -47,18 +74,13 @@ export function Login() {
       });
 
       if (response.data.status === "success") {
-        // Setting a dummy token in AsyncStorage for now
         await AsyncStorage.setItem("userToken", "dummy-token");
-
-        // Navigate to Home screen on successful login
         navigate("home");
       } else {
         Alert.alert("Login failed", response.data.message);
       }
     } catch (error) {
       await AsyncStorage.setItem("userToken", "dummy-token");
-
-      // Navigate to Home screen on successful login
       navigate("home");
     }
   };
@@ -66,24 +88,27 @@ export function Login() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>BBSC</Text>
-      <Text style={styles.title}>BRIJLAL BIYANI SCIENCE COLLEGE</Text>
-      <Text style={styles.title2}>Login</Text>
+      <Text style={styles.subtitle}>BRIJLAL BIYANI SCIENCE COLLEGE</Text>
 
       <TextInput
         style={styles.input}
         placeholder="Username"
+        placeholderTextColor="#AAAAAA"
         value={username}
         onChangeText={setUsername}
       />
       <TextInput
         style={styles.input}
         placeholder="Password"
+        placeholderTextColor="#AAAAAA"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
       />
 
-      <Button title="Login" onPress={handleLogin} />
+      <TouchableOpacity style={styles.button} onPress={handleLogin}>
+        <Text style={styles.buttonText}>Login</Text>
+      </TouchableOpacity>
     </View>
   );
 }

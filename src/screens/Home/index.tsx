@@ -36,12 +36,12 @@ export function Home() {
     <View style={styles.container}>
       <Header
         icon={Trophy}
-        title="Let's Study"
-        subtitle="Train your knowledge"
+        title="Pranay Lamse"
+        subtitle="Class: M.Tech (CSE)"
         onPress={() => navigate("history")}
       />
 
-      <View style={styles.levels}>
+      {/*  <View style={styles.levels}>
         <Level
           title="Easy"
           type="EASY"
@@ -60,7 +60,7 @@ export function Home() {
           onPress={() => handleLevelFilter(3)}
           isChecked={levels.includes(3)}
         />
-      </View>
+      </View> */}
 
       <FlatList
         data={quizzes}
